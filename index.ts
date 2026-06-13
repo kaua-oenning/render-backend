@@ -2,6 +2,7 @@ import http from 'http';
 import express from 'express';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
+import dotenv from 'dotenv';
 import { graphqlHTTP } from 'express-graphql';
 import schema from './graphql/schema';
 import resolvers from './graphql/resolvers';
@@ -11,11 +12,15 @@ import rotasPlataforma from './plataforma';
 import rotasSerie from './serie';
 import rotasEpisodio from './episodio';
 
+dotenv.config();
+
+const PORT = Number(process.env.PORT) || 3000;
+const corsOrigin = process.env.CORS_ORIGIN || '*';
+
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
-// CORS baseado na configuração do meu ngrok (ngrok http 4000)...
-app.use(cors({ origin: 'http://localhost:4000', credentials: true }));
+app.use(cors({ origin: corsOrigin, credentials: true }));
 
 app.use((req, res, next) => {
     res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'self'");
@@ -34,6 +39,6 @@ app.use('/graphql', graphqlHTTP({
     graphiql: true,
 }));
 
-http.createServer({}, app).listen(3000, () => {
-    console.log('Servidor iniciado');
+http.createServer({}, app).listen(PORT, '0.0.0.0', () => {
+    console.log(`Servidor iniciado na porta ${PORT}`);
 });
